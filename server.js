@@ -3,11 +3,11 @@ const express = require('express');
 const cors = require('cors');
 const mongoose = require('mongoose');
 const chatRoutes = require('./routes/chat');
+const authRoutes = require('./routes/auth');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Conectar no MongoDB
 mongoose.connect(process.env.MONGODB_URI)
   .then(() => console.log('Banco de dados conectado!'))
   .catch(err => console.error('Erro ao conectar no banco:', err));
@@ -17,6 +17,7 @@ app.use(express.json());
 app.use(express.static('public'));
 
 app.use('/api', chatRoutes);
+app.use('/api', authRoutes);   // ← adicione esta linha
 
 app.get('/', (req, res) => {
   res.json({

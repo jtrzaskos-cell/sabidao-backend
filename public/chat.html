@@ -46,13 +46,117 @@
       -webkit-text-fill-color: transparent;
     }
 
-    .voltar {
+    .user-info {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      font-size: 0.9rem;
       color: var(--cinza);
-      text-decoration: none;
+    }
+
+    .btn-sair {
+      background: transparent;
+      border: 1px solid rgba(139, 92, 246, 0.4);
+      color: var(--cinza);
+      padding: 0.4rem 0.9rem;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 0.85rem;
+    }
+
+    .btn-sair:hover { color: white; border-color: var(--roxo); }
+
+    /* Tela de Auth */
+    #auth-screen {
+      flex: 1;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 2rem;
+    }
+
+    .auth-box {
+      background: var(--preto-suave);
+      border: 1px solid rgba(139, 92, 246, 0.25);
+      border-radius: 20px;
+      padding: 2.5rem;
+      width: 100%;
+      max-width: 420px;
+    }
+
+    .auth-box h2 {
+      text-align: center;
+      margin-bottom: 0.5rem;
+      font-size: 1.6rem;
+    }
+
+    .auth-box p {
+      text-align: center;
+      color: var(--cinza);
+      margin-bottom: 2rem;
       font-size: 0.95rem;
     }
 
-    .voltar:hover { color: white; }
+    .auth-box input, .auth-box select {
+      width: 100%;
+      padding: 0.9rem 1.1rem;
+      margin-bottom: 1rem;
+      border-radius: 12px;
+      border: 1px solid rgba(139, 92, 246, 0.25);
+      background: rgba(255,255,255,0.04);
+      color: white;
+      font-size: 0.95rem;
+      outline: none;
+      font-family: inherit;
+    }
+
+    .auth-box input:focus, .auth-box select:focus {
+      border-color: var(--roxo);
+    }
+
+    .auth-box button {
+      width: 100%;
+      padding: 0.95rem;
+      border: none;
+      border-radius: 12px;
+      background: var(--gradiente);
+      color: white;
+      font-weight: 600;
+      font-size: 1rem;
+      cursor: pointer;
+      margin-top: 0.5rem;
+    }
+
+    .auth-box button:hover {
+      opacity: 0.9;
+    }
+
+    .auth-toggle {
+      text-align: center;
+      margin-top: 1.5rem;
+      font-size: 0.9rem;
+      color: var(--cinza);
+    }
+
+    .auth-toggle span {
+      color: var(--azul);
+      cursor: pointer;
+      font-weight: 600;
+    }
+
+    .erro-msg {
+      background: rgba(239, 68, 68, 0.15);
+      border: 1px solid rgba(239, 68, 68, 0.3);
+      color: #fca5a5;
+      padding: 0.8rem;
+      border-radius: 10px;
+      margin-bottom: 1rem;
+      font-size: 0.9rem;
+      display: none;
+    }
+
+    /* Chat */
+    #chat-screen { display: none; flex-direction: column; height: 100%; }
 
     #chat {
       flex: 1;
@@ -103,13 +207,7 @@
       border-top: 1px solid rgba(139, 92, 246, 0.15);
     }
 
-    .input-group {
-      display: flex;
-      gap: 0.8rem;
-      margin-bottom: 0.8rem;
-    }
-
-    input, textarea {
+    textarea {
       width: 100%;
       padding: 0.9rem 1.1rem;
       border-radius: 14px;
@@ -119,18 +217,14 @@
       font-size: 0.95rem;
       outline: none;
       font-family: inherit;
-    }
-
-    input:focus, textarea:focus {
-      border-color: var(--roxo);
-    }
-
-    textarea {
       resize: none;
       height: 80px;
+      margin-bottom: 0.8rem;
     }
 
-    button {
+    textarea:focus { border-color: var(--roxo); }
+
+    #btnEnviar {
       width: 100%;
       padding: 0.95rem;
       border: none;
@@ -140,80 +234,210 @@
       font-weight: 600;
       font-size: 1rem;
       cursor: pointer;
-      transition: transform 0.2s, box-shadow 0.2s;
     }
 
-    button:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 8px 25px rgba(139, 92, 246, 0.35);
-    }
-
-    button:disabled {
+    #btnEnviar:disabled {
       opacity: 0.6;
       cursor: not-allowed;
-      transform: none;
     }
   </style>
 </head>
 <body>
-  <header>
-    <div class="logo">Sabidão</div>
-    <a href="index.html" class="voltar">← Voltar</a>
-  </header>
 
-  <div id="chat">
-    <div class="mensagem sabidao">
-      <div class="nome">Sabidão</div>
-      Olá! Eu sou o Sabidão 🦉<br>
-      Pode me perguntar qualquer dúvida de estudo. Estou aqui para te ajudar!
+  <!-- TELA DE LOGIN / CADASTRO -->
+  <div id="auth-screen">
+    <div class="auth-box">
+      <h2 id="auth-titulo">Entrar no Sabidão</h2>
+      <p id="auth-subtitulo">Acesse sua conta para continuar</p>
+
+      <div class="erro-msg" id="erro-msg"></div>
+
+      <!-- Formulário de Login -->
+      <div id="form-login">
+        <input type="email" id="login-email" placeholder="Seu e-mail">
+        <input type="password" id="login-senha" placeholder="Sua senha">
+        <button onclick="fazerLogin()">Entrar</button>
+        <div class="auth-toggle">
+          Não tem conta? <span onclick="mostrarCadastro()">Cadastre-se</span>
+        </div>
+      </div>
+
+      <!-- Formulário de Cadastro -->
+      <div id="form-cadastro" style="display: none;">
+        <input type="text" id="cadastro-nome" placeholder="Seu nome">
+        <input type="email" id="cadastro-email" placeholder="Seu e-mail">
+        <input type="password" id="cadastro-senha" placeholder="Crie uma senha">
+        <select id="cadastro-tipo">
+          <option value="aluno">Sou Aluno</option>
+          <option value="professor">Sou Professor</option>
+          <option value="pais">Sou Responsável</option>
+        </select>
+        <button onclick="fazerCadastro()">Criar conta</button>
+        <div class="auth-toggle">
+          Já tem conta? <span onclick="mostrarLogin()">Fazer login</span>
+        </div>
+      </div>
     </div>
   </div>
 
-  <div class="input-area">
-    <div class="input-group">
-      <input type="text" id="aluno" placeholder="Seu nome (opcional)">
+  <!-- TELA DO CHAT -->
+  <div id="chat-screen">
+    <header>
+      <div class="logo">Sabidão</div>
+      <div class="user-info">
+        <span id="nome-usuario"></span>
+        <button class="btn-sair" onclick="sair()">Sair</button>
+      </div>
+    </header>
+
+    <div id="chat">
+      <div class="mensagem sabidao">
+        <div class="nome">Sabidão</div>
+        Olá! Eu sou o Sabidão 🦉<br>
+        Pode me perguntar qualquer dúvida de estudo. Estou aqui para te ajudar!
+      </div>
     </div>
-    <textarea id="pergunta" placeholder="Digite sua dúvida aqui..."></textarea>
-    <br><br>
-    <button id="btnEnviar" onclick="enviarPergunta()">Enviar pergunta</button>
+
+    <div class="input-area">
+      <textarea id="pergunta" placeholder="Digite sua dúvida aqui..."></textarea>
+      <button id="btnEnviar" onclick="enviarPergunta()">Enviar pergunta</button>
+    </div>
   </div>
 
   <script>
-    const chat = document.getElementById('chat');
-    const btn = document.getElementById('btnEnviar');
+    let usuarioLogado = null;
+
+    // Verificar se já está logado
+    const salvo = localStorage.getItem('sabidao_usuario');
+    if (salvo) {
+      usuarioLogado = JSON.parse(salvo);
+      mostrarChat();
+    }
+
+    function mostrarCadastro() {
+      document.getElementById('form-login').style.display = 'none';
+      document.getElementById('form-cadastro').style.display = 'block';
+      document.getElementById('auth-titulo').innerText = 'Criar conta';
+      document.getElementById('auth-subtitulo').innerText = 'Preencha os dados para se cadastrar';
+      document.getElementById('erro-msg').style.display = 'none';
+    }
+
+    function mostrarLogin() {
+      document.getElementById('form-cadastro').style.display = 'none';
+      document.getElementById('form-login').style.display = 'block';
+      document.getElementById('auth-titulo').innerText = 'Entrar no Sabidão';
+      document.getElementById('auth-subtitulo').innerText = 'Acesse sua conta para continuar';
+      document.getElementById('erro-msg').style.display = 'none';
+    }
+
+    function mostrarErro(msg) {
+      const el = document.getElementById('erro-msg');
+      el.innerText = msg;
+      el.style.display = 'block';
+    }
+
+    async function fazerCadastro() {
+      const nome = document.getElementById('cadastro-nome').value.trim();
+      const email = document.getElementById('cadastro-email').value.trim();
+      const senha = document.getElementById('cadastro-senha').value;
+      const tipo = document.getElementById('cadastro-tipo').value;
+
+      if (!nome || !email || !senha) {
+        return mostrarErro('Preencha todos os campos');
+      }
+
+      try {
+        const res = await fetch('/api/cadastro', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ nome, email, senha, tipo })
+        });
+
+        const dados = await res.json();
+
+        if (dados.sucesso) {
+          usuarioLogado = dados.usuario;
+          localStorage.setItem('sabidao_usuario', JSON.stringify(usuarioLogado));
+          mostrarChat();
+        } else {
+          mostrarErro(dados.erro || 'Erro ao cadastrar');
+        }
+      } catch (e) {
+        mostrarErro('Erro de conexão com o servidor');
+      }
+    }
+
+    async function fazerLogin() {
+      const email = document.getElementById('login-email').value.trim();
+      const senha = document.getElementById('login-senha').value;
+
+      if (!email || !senha) {
+        return mostrarErro('Preencha e-mail e senha');
+      }
+
+      try {
+        const res = await fetch('/api/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, senha })
+        });
+
+        const dados = await res.json();
+
+        if (dados.sucesso) {
+          usuarioLogado = dados.usuario;
+          localStorage.setItem('sabidao_usuario', JSON.stringify(usuarioLogado));
+          mostrarChat();
+        } else {
+          mostrarErro(dados.erro || 'Erro ao fazer login');
+        }
+      } catch (e) {
+        mostrarErro('Erro de conexão com o servidor');
+      }
+    }
+
+    function mostrarChat() {
+      document.getElementById('auth-screen').style.display = 'none';
+      document.getElementById('chat-screen').style.display = 'flex';
+      document.getElementById('nome-usuario').innerText = usuarioLogado.nome;
+    }
+
+    function sair() {
+      localStorage.removeItem('sabidao_usuario');
+      usuarioLogado = null;
+      location.reload();
+    }
 
     async function enviarPergunta() {
       const pergunta = document.getElementById('pergunta').value.trim();
-      const aluno = document.getElementById('aluno').value.trim() || 'Aluno';
+      if (!pergunta) return alert('Digite uma pergunta!');
 
-      if (!pergunta) {
-        alert('Digite uma pergunta!');
-        return;
-      }
-
-      adicionarMensagem(aluno, pergunta, 'aluno');
+      adicionarMensagem(usuarioLogado.nome, pergunta, 'aluno');
       document.getElementById('pergunta').value = '';
 
+      const btn = document.getElementById('btnEnviar');
       btn.disabled = true;
       btn.innerText = 'Sabidão está pensando...';
 
       try {
-        const resposta = await fetch('/api/perguntar', {
+        const res = await fetch('/api/perguntar', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ pergunta, aluno })
+          body: JSON.stringify({
+            pergunta,
+            aluno: usuarioLogado.nome
+          })
         });
 
-        const dados = await resposta.json();
+        const dados = await res.json();
 
         if (dados.sucesso) {
           adicionarMensagem('Sabidão', dados.resposta, 'sabidao');
         } else {
-          adicionarMensagem('Sabidão', 'Desculpe, ocorreu um erro. Tente novamente.', 'sabidao');
+          adicionarMensagem('Sabidão', 'Desculpe, ocorreu um erro.', 'sabidao');
         }
-      } catch (erro) {
-        adicionarMensagem('Sabidão', 'Não consegui me conectar ao servidor.', 'sabidao');
-        console.error(erro);
+      } catch (e) {
+        adicionarMensagem('Sabidão', 'Erro de conexão.', 'sabidao');
       }
 
       btn.disabled = false;
@@ -224,8 +448,8 @@
       const div = document.createElement('div');
       div.className = `mensagem ${tipo}`;
       div.innerHTML = `<div class="nome">${nome}</div>${texto.replace(/\n/g, '<br>')}`;
-      chat.appendChild(div);
-      chat.scrollTop = chat.scrollHeight;
+      document.getElementById('chat').appendChild(div);
+      document.getElementById('chat').scrollTop = document.getElementById('chat').scrollHeight;
     }
 
     document.getElementById('pergunta').addEventListener('keydown', function(e) {
