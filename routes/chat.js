@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const Groq = require('groq-sdk');
+const Mensagem = require('../models/Mensagem');
 
 const groq = new Groq({
   apiKey: process.env.GROQ_API_KEY
@@ -30,6 +31,13 @@ Use linguagem adequada para estudantes do ensino fundamental e médio.`;
 
     const resposta = completion.choices[0]?.message?.content || 'Desculpe, não consegui responder.';
 
+    // Salvar no banco de dados
+    await Mensagem.create({
+      aluno: aluno || 'Anônimo',
+      pergunta,
+      resposta
+    });
+
     res.json({
       sucesso: true,
       resposta,
@@ -42,6 +50,16 @@ Use linguagem adequada para estudantes do ensino fundamental e médio.`;
       erro: 'Erro ao processar a pergunta',
       detalhes: erro.message
     });
+  }
+});
+
+// Rota para ver o histórico
+router.get('/historico', async (req, res) => {
+  try {
+    const mensagens = await Mensagem.find().sort({ data: -1 }).limit(50);
+    res.json(mensagens);
+  } catch (erro) {
+    res.status(500).json({ erro: 'Erro ao buscar histórico' });
   }
 });
 
