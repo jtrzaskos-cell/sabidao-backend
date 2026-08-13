@@ -73,3 +73,5 @@ router.get('/historico', async (req, res) => {
     res.status(500).json({ erro: 'Erro ao buscar histórico' });
   }
 });
+
+module.exports= router;
