@@ -54,13 +54,22 @@ Use linguagem adequada para estudantes do ensino fundamental e médio.`;
 });
 
 // Rota para ver o histórico
+// Rota para ver o histórico (do usuário ou geral)
 router.get('/historico', async (req, res) => {
   try {
-    const mensagens = await Mensagem.find().sort({ data: -1 }).limit(50);
+    const { aluno } = req.query;
+
+    let filtro = {};
+    if (aluno) {
+      filtro.aluno = aluno;
+    }
+
+    const mensagens = await Mensagem.find(filtro)
+      .sort({ data: -1 })
+      .limit(50);
+
     res.json(mensagens);
   } catch (erro) {
     res.status(500).json({ erro: 'Erro ao buscar histórico' });
   }
 });
-
-module.exports = router;
